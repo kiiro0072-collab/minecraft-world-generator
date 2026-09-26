@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minecraft World Generator - 日本の地形でマイクラワールドを生成</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans JP', sans-serif; line-height: 1.7; color: #1a1a2e; background: #fafafa; }
+    a { color: #2563eb; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+    header { padding: 80px 0 40px; text-align: center; background: #1e3a8a; color: white; }
+    header h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; margin-bottom: 16px; letter-spacing: -0.02em; }
+    header p { font-size: clamp(1rem, 2.5vw, 1.25rem); opacity: 0.9; max-width: 600px; margin: 0 auto; }
+    .badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+    .badge { padding: 6px 14px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; background: none; border: 1px solid rgba(255,255,255,0.3); color: white; }
+    main { padding: 60px 0; }
+    section { margin-bottom: 60px; }
+    h2 { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; margin-bottom: 24px; color: #1e293b; }
+    h3 { font-size: 1.1rem; font-weight: 600; margin: 16px 0 8px; color: #334155; }
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+    .card { background: transparent; border-radius: 0; padding: 24px 0; border: none; box-shadow: none; }
+    .card:hover { transform: none; box-shadow: none; }
+    .card-icon { width: 48px; height: 48px; border-radius: 0; background: none; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+    .card-icon svg { width: 24px; height: 24px; stroke: #3b82f6; }
+    .card h3 { font-size: 1.15rem; margin-bottom: 8px; }
+    .card p { color: #64748b; font-size: 0.95rem; }
+    .usage { background: transparent; border-radius: 0; padding: 16px 0; border: none; }
+    .step { display: flex; gap: 16px; margin-bottom: 24px; }
+    .step:last-child { margin-bottom: 0; }
+    .step-num { width: 40px; height: 40px; border-radius: 0; background: none; color: #3b82f6; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.5rem; flex-shrink: 0; border: 2px solid #3b82f6; }
+    .step-content h3 { margin-bottom: 4px; }
+    .step-content p { color: #64748b; }
+    .code-block { background: transparent; color: #333; padding: 16px 0; border-radius: 0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.85rem; overflow-x: auto; margin: 16px 0; border: none; }
+    .code-block .comment { color: #64748b; }
+    .code-block .keyword { color: #c084fc; }
+    .code-block .string { color: #4ade80; }
+    .api-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-top: 16px; }
+    .api-item { background: transparent; padding: 12px 0; border-radius: 0; border: none; border-bottom: none; }
+    .api-item code { background: transparent; padding: 2px 4px; border-radius: 4px; font-size: 0.85rem; font-family: 'SF Mono', 'Fira Code', monospace; color: #2563eb; }
+    .tech-stack { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .tech { padding: 6px 14px; background: #eff6ff; color: #3730a3; border-radius: 999px; font-size: 0.85rem; font-weight: 500; border: none; }
+    footer { padding: 40px 0; text-align: center; color: #94a3b8; font-size: 0.9rem; border-top: none; margin-top: 60px; padding-top: 40px; }
+    @media (max-width: 640px) {
+      header { padding: 60px 0 30px; }
+      .step { flex-direction: column; gap: 8px; }
+      .step-num { width: 32px; height: 32px; font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Minecraft World Generator</h1>
+      <p>国土地理院のDEMデータとOpenStreetMapから、現実世界の地形を再現したMinecraftワールドを自動生成</p>
+      <div class="badges">
+        <span class="badge">Java 24</span>
+        <span class="badge">Maven</span>
+        <span class="badge">React + Leaflet</span>
+        <span class="badge">Minecraft 1.21.8</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section>
+      <h2>概要</h2>
+      <p style="font-size: 1.1rem; color: #475569; max-width: 720px;">
+        このツールは、<strong>国土地理院が提供する数値標高モデル（DEM）</strong>と<strong>OpenStreetMapの地図タイル</strong>を使用して、
+        日本国内の任意の場所をMinecraftのワールドとして生成します。
+        標高データをブロックの高さに変換し、現実の地形を忠実に再現します。
+      </p>
+    </section>
+
+    <section>
+      <h2>主な機能</h2>
+      <div class="features">
+        <article class="card">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16v-2"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          </div>
+          <h3>地理院DEM対応</h3>
+          <p>国土地理院の標高タイル（dem_png）を取得し、RGB値から標高をデコード。海面（0m）から富士山（3776m）まで正確に再現。</p>
+        </article>
+        <article class="card">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
+          </div>
+          <h3>OSMタイル表示</h3>
+          <p>OpenStreetMapのタイルを背景地図として表示。WebUIではLeafletを使用し、直感的な範囲選択が可能。</p>
+        </article>
+        <article class="card">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon><line x1="12" y1="22" x2="12" y2="15.5"></line><polyline points="22 8.5 12 15.5 2 8.5"></polyline></svg>
+          </div>
+          <h3>Minecraft 1.21.8 対応</h3>
+          <p>最新バージョンのワールドフォルダ形式で出力。regionファイル（.mca）とlevel.datを自動生成。</p>
+        </article>
+        <article class="card">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </div>
+          <h3>Web UI / CLI 両対応</h3>
+          <p>ブラウザで地図上から範囲を選んで生成、またはコマンドラインから座標指定で一括生成が可能。</p>
+        </article>
+        <article class="card">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          </div>
+          <h3>ZIPダウンロード</h3>
+          <p>生成完了後、ワールドフォルダをZIP圧縮してワンクリックでダウンロード。サーバーへの導入が簡単。</p>
+        </article>
+        <article class="card">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </div>
+          <h3>並列ダウンロード</h3>
+          <p>最大64スレッドでタイルを並列取得。広範囲でも高速に処理完了。進捗はリアルタイムで表示。</p>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>使い方</h2>
+      <div class="usage">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h3>ビルド</h3>
+            <p>MavenでJARをビルドし、Web UI用のフロントエンドもビルドします。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h3>Web UI を起動</h3>
+            <p><code>java -jar untitled10.jar --webui</code> でWebサーバーが起動し、ブラウザが自動で開きます（デフォルト: <code>http://localhost:8787</code>）。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h3>範囲を選択</h3>
+            <p>地図上でクリックして1点目・2点目を指定。ズームレベル（3〜15）で詳細度を調整。2点で矩形範囲が確定します。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h3>生成実行</h3>
+            <p>「ワールドを生成」ボタンで開始。進捗バーと残り時間（ETA）がリアルタイム表示されます。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <h3>ダウンロード</h3>
+            <p>完了後「ワールドをダウンロード (ZIP)」で保存。解凍して <code>server.properties</code> の <code>level-name</code> にフォルダ名を指定すれば即プレイ可能。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>CLI モード（コマンドライン）</h2>
+      <p style="color: #475569; margin-bottom: 16px;">Web UIを使わず、コマンドラインから直接生成することも可能です。</p>
+      <div class="code-block"><span class="comment"># PNG画像として出力（標高カラーマップ）</span>
+<span class="keyword">java</span> -jar untitled10.jar
+<span class="comment"># 対話的に座標・ズーム・出力先を指定</span>
+
+<span class="comment"># Minecraftワールドとして出力</span>
+<span class="keyword">java</span> -jar untitled10.jar
+<span class="comment"># モード選択で "2" を入力</span>
+<span class="comment"># 対話的にタイル座標・ズーム・出力先を指定</span></div>
+    </section>
+
+    <section>
+      <h2>API エンドポイント（Web UI用）</h2>
+      <div class="api-list">
+        <div class="api-item"><code>POST /api/generate</code> - ワールド生成開始</div>
+        <div class="api-item"><code>GET  /api/progress</code> - SSE で進捗取得</div>
+        <div class="api-item"><code>GET  /api/download</code> - ZIPダウンロード</div>
+        <div class="api-item"><code>GET  /api/tiles/{z}/{x}/{y}.png</code> - OSMタイルプロキシ</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>技術スタック</h2>
+      <div class="tech-stack">
+        <span class="tech">Java 24</span>
+        <span class="tech">Maven</span>
+        <span class="tech">React 18</span>
+        <span class="tech">TypeScript</span>
+        <span class="tech">Vite</span>
+        <span class="tech">Leaflet</span>
+        <span class="tech">Swing (GUI版)</span>
+        <span class="tech">com.sun.net.httpserver</span>
+      </div>
+    </section>
+
+    <section>
+      <h2>データ出典・ライセンス</h2>
+      <ul style="color: #475569; padding-left: 20px; line-height: 2;">
+        <li>標高データ: <a href="https://maps.gsi.go.jp/development/ichiran.html#dem" target="_blank">国土地理院「地理院タイル（DEM）」</a> - 出典表示必須</li>
+        <li>地図タイル: <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap Contributors</a> - ODbL / CC-BY-SA</li>
+        <li>本ツールのコード: MIT License（予定）</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>必要環境</h2>
+      <ul style="color: #475569; padding-left: 20px; line-height: 2;">
+        <li>Java 24 以上</li>
+        <li>Maven 3.9+（ビルド時のみ）</li>
+        <li>Node.js 18+ / npm（Web UIビルド時のみ）</li>
+        <li>インターネット接続（タイル・標高データのダウンロードに必要）</li>
+      </ul>
+    </section>
+  </main>
+
+  <section>
+      <h2>ダウンロード</h2>
+      <p style="color: #475569; margin-bottom: 20px; max-width: 720px;">
+        最新版は GitHub Releases からダウンロードできます。解凍して <code>run.bat</code> を実行するだけで起動します。
+      </p>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px;">
+        <a href="https://github.com/YOUR_USERNAME/YOUR_REPO/releases/latest" target="_blank" style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px; background: #1e3a8a; color: white; border-radius: 8px; font-weight: 600; font-size: 1.05rem; transition: background 0.2s;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          最新版をダウンロード (ZIP)
+        </a>
+        <a href="https://github.com/YOUR_USERNAME/YOUR_REPO/releases" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; padding: 14px 24px; background: transparent; color: #3b82f6; border: 2px solid #3b82f6; border-radius: 8px; font-weight: 600; font-size: 1rem;">
+          全リリースを見る
+        </a>
+      </div>
+      <p style="color: #94a3b8; font-size: 0.9rem;">
+        <strong>必要環境:</strong> Java 24 以上 / Windows・macOS・Linux 対応
+      </p>
+    </section>
+
+    <section>
+      <h2>ソースコード・貢献</h2>
+      <p style="color: #475569; margin-bottom: 16px; max-width: 720px;">
+        ソースコードは GitHub で公開しています。Issue・PR・Star をお待ちしています。
+      </p>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <a href="https://github.com/YOUR_USERNAME/YOUR_REPO" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: #0f172a; color: white; border-radius: 8px; font-weight: 500;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+          GitHub リポジトリ
+        </a>
+        <a href="https://github.com/YOUR_USERNAME/YOUR_REPO/issues" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: transparent; color: #3b82f6; border: 2px solid #3b82f6; border-radius: 8px; font-weight: 500;">
+          Issue 報告
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Minecraft World Generator — 日本の地形をマイクラで冒険しよう</p>
+      <p style="margin-top: 8px;">Built with ☕ Java + ⚛️ React + 🗺️ OpenStreetMap + 🏔️ GSI DEM</p>
+    </div>
+  </footer>
+</body>
+</html>
