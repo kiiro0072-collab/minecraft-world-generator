@@ -58,12 +58,31 @@
       <p>国土地理院のDEMデータとOpenStreetMapから、現実世界の地形を再現したMinecraftワールドを自動生成</p>
       <div class="badges">
         <span class="badge">Java 24</span>
-        <span class="badge">Maven</span>
-        <span class="badge">React + Leaflet</span>
+        <span class="badge">ビルド不要</span>
+        <span class="badge">Leaflet</span>
         <span class="badge">Minecraft 1.21.8</span>
       </div>
     </div>
   </header>
+
+  <section class="section-center">
+      <h2>ダウンロード</h2>
+      <p style="color: #475569; margin-bottom: 20px; max-width: 720px; margin-left: auto; margin-right: auto;">
+        ZIPを解凍して <code>GUI.bat</code> を実行するだけで起動します。ビルド環境・Node.js は不要です。
+      </p>
+      <div class="button-group">
+        <a href="https://github.com/kiiro0072-collab/minecraft-world-generator/releases/download/Ver/minecraft-world-generator.zip" download="minecraft-world-generator.zip" style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px; background: #1e3a8a; color: white; border-radius: 8px; font-weight: 600; font-size: 1.05rem; transition: background 0.2s;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 1-2 2H5a2 2 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          最新版をダウンロード (ZIP)
+        </a>
+        <a href="https://github.com/kiiro0072-collab/minecraft-world-generator/releases" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; padding: 14px 24px; background: transparent; color: #3b82f6; border: 2px solid #3b82f6; border-radius: 8px; font-weight: 600; font-size: 1rem;">
+          全リリースを見る
+        </a>
+      </div>
+      <p style="color: #94a3b8; font-size: 0.9rem;">
+        <strong>必要環境:</strong> Java 24 以上 / Windows・macOS・Linux 対応
+      </p>
+    </section>
 
   <main class="container">
     <section>
@@ -90,7 +109,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
           </div>
           <h3>OSMタイル表示</h3>
-          <p>OpenStreetMapのタイルを背景地図として表示。WebUIではLeafletを使用し、直感的な範囲選択が可能。</p>
+          <p>OpenStreetMapのタイルを背景地図として表示。WebUIはブラウザにLeafletを直接読み込むため、ビルド工程なしで直感的な範囲選択が可能です。</p>
         </article>
         <article class="card">
           <div class="card-icon">
@@ -117,8 +136,8 @@
           <div class="card-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
           </div>
-          <h3>並列ダウンロード</h3>
-          <p>最大64スレッドでタイルを並列取得。広範囲でも高速に処理完了。進捗はリアルタイムで表示。</p>
+          <h3>並列生成</h3>
+          <p>タイルを並列取得し、1024×1024ブロックのグリッド単位で分割してマルチスレッド生成。広範囲でも高速に処理完了。進捗はリアルタイムで表示。</p>
         </article>
       </div>
     </section>
@@ -129,33 +148,26 @@
         <div class="step">
           <div class="step-num">1</div>
           <div class="step-content">
-            <h3>ビルド</h3>
-            <p>MavenでJARをビルドし、Web UI用のフロントエンドもビルドします。</p>
+            <h3>解凍して起動</h3>
+            <p>ZIPを解凍し、<code>GUI.bat</code> をダブルクリック。Webサーバーが起動してブラウザが自動で開きます（デフォルト: <code>http://localhost:8787</code>）。ビルドや Node.js のインストールは不要です。</p>
           </div>
         </div>
         <div class="step">
           <div class="step-num">2</div>
-          <div class="step-content">
-            <h3>Web UI を起動</h3>
-            <p><code>java -jar untitled10.jar --webui</code> でWebサーバーが起動し、ブラウザが自動で開きます（デフォルト: <code>http://localhost:8787</code>）。</p>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num">3</div>
           <div class="step-content">
             <h3>範囲を選択</h3>
             <p>地図上でクリックして1点目・2点目を指定。ズームレベル（3〜15）で詳細度を調整。2点で矩形範囲が確定します。</p>
           </div>
         </div>
         <div class="step">
-          <div class="step-num">4</div>
+          <div class="step-num">3</div>
           <div class="step-content">
             <h3>生成実行</h3>
             <p>「ワールドを生成」ボタンで開始。進捗バーと残り時間（ETA）がリアルタイム表示されます。</p>
           </div>
         </div>
         <div class="step">
-          <div class="step-num">5</div>
+          <div class="step-num">4</div>
           <div class="step-content">
             <h3>ダウンロード</h3>
             <p>完了後「ワールドをダウンロード (ZIP)」で保存。解凍して <code>server.properties</code> の <code>level-name</code> にフォルダ名を指定すれば即プレイ可能。</p>
@@ -191,12 +203,9 @@
       <h2>技術スタック</h2>
       <div class="tech-stack">
         <span class="tech">Java 24</span>
-        <span class="tech">Maven</span>
-        <span class="tech">React 18</span>
-        <span class="tech">TypeScript</span>
-        <span class="tech">Vite</span>
         <span class="tech">Leaflet</span>
         <span class="tech">Swing (GUI版)</span>
+        <span class="tech">java.net.http.HttpClient</span>
         <span class="tech">com.sun.net.httpserver</span>
       </div>
     </section>
@@ -213,40 +222,17 @@
     <section>
       <h2>必要環境</h2>
       <ul style="color: #475569; padding-left: 20px; line-height: 2;">
-        <li>Java 24 以上</li>
-        <li>Maven 3.9+（ビルド時のみ）</li>
-        <li>Node.js 18+ / npm（Web UIビルド時のみ）</li>
+        <li>Java 24 以上（さえあれば動きます）</li>
+        <li>ビルドدوات・Node.js は不要</li>
         <li>インターネット接続（タイル・標高データのダウンロードに必要）</li>
       </ul>
     </section>
   </main>
 
-<section class="section-center">
-      <h2>ダウンロード</h2>
-      <p style="color: #475569; margin-bottom: 20px; max-width: 720px; margin-left: auto; margin-right: auto;">
-        最新版は GitHub Releases からダウンロードできます。解凍して <code>run.bat</code> を実行するだけで起動します。
-      </p>
-      <div class="button-group">
-        <a href="https://github.com/kiiro0072-collab/minecraft-world-generator/releases/download/Ver/minecraft-world-generator.zip" download="minecraft-world-generator.zip" style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px; background: #1e3a8a; color: white; border-radius: 8px; font-weight: 600; font-size: 1.05rem; transition: background 0.2s;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-          最新版をダウンロード (ZIP)
-        </a>
-        <a href="https://github.com/YOUR_USERNAME/YOUR_REPO/releases" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; padding: 14px 24px; background: transparent; color: #3b82f6; border: 2px solid #3b82f6; border-radius: 8px; font-weight: 600; font-size: 1rem;">
-          全リリースを見る
-        </a>
-      </div>
-      <p style="color: #94a3b8; font-size: 0.9rem;">
-        <strong>必要環境:</strong> Java 24 以上 / Windows・macOS・Linux 対応
-      </p>
-    </section>
-
-
-  </main>
-
   <footer>
     <div class="container">
       <p>Minecraft World Generator — 日本の地形をマイクラで冒険しよう</p>
-      <p style="margin-top: 8px;">Built with ☕ Java + ⚛️ React + 🗺️ OpenStreetMap + 🏔️ GSI DEM</p>
+      <p style="margin-top: 8px;">Built with ☕ Java + 🗺️ OpenStreetMap + 🏔️ GSI DEM</p>
     </div>
   </footer>
 </body>
